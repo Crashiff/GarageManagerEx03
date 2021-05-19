@@ -1,6 +1,0 @@
-C:\Users\natan\Desktop\Ex03.GarageLogic-master\Ex03.GarageLogic\bin\Debug\Ex03.GarageLogic.dll
-C:\Users\natan\Desktop\Ex03.GarageLogic-master\Ex03.GarageLogic\bin\Debug\Ex03.GarageLogic.pdb
-C:\Users\natan\Desktop\Ex03.GarageLogic-master\Ex03.GarageLogic\obj\Debug\Ex03.GarageLogic.csprojAssemblyReference.cache
-C:\Users\natan\Desktop\Ex03.GarageLogic-master\Ex03.GarageLogic\obj\Debug\Ex03.GarageLogic.csproj.CoreCompileInputs.cache
-C:\Users\natan\Desktop\Ex03.GarageLogic-master\Ex03.GarageLogic\obj\Debug\Ex03.GarageLogic.dll
-C:\Users\natan\Desktop\Ex03.GarageLogic-master\Ex03.GarageLogic\obj\Debug\Ex03.GarageLogic.pdb
