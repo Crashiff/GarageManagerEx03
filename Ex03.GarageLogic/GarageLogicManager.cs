@@ -30,20 +30,32 @@ namespace Ex03.GarageLogic
                 return m_GarageVehicles;
             }
         }
-
-        public string[] GetListOfVehicleByStatus(int[] i_WantedStatusVehicles)
+ private static void checkIfValuesAreInRange(int[] i_WantedStatusVehicles)
         {
-
-            foreach(Vehicle vehicle in Garage)
+            foreach(int option in i_WantedStatusVehicles)
             {
-                if (i_WantedStatusVehicles.find(vehicle.GarageStatus)
+                if(option < (int)Vehicle.eGarageStatus.InRepair || option > (int)Vehicle.eGarageStatus.RepairedAndPaid)
                 {
-
+                    throw new ValueOutOfRangeException(
+                        (int)Vehicle.eGarageStatus.RepairedAndPaid,
+                        (int)Vehicle.eGarageStatus.InRepair);
                 }
-
-
+            }
+        }
+        public static StringBuilder GetListOfVehicleByStatus(int[] i_WantedStatusVehicles)
+        {
+            StringBuilder licensePlateOfWantedVehicles = new StringBuilder();
+            checkIfValuesAreInRange(i_WantedStatusVehicles);
+            foreach (Vehicle vehicle in Garage.GarageDictionary.Values)
+            {
+                if (Array.Exists(i_WantedStatusVehicles, i_X => i_X.Equals(vehicle.GarageStatus)))
+                {
+                    licensePlateOfWantedVehicles.AppendFormat("{0} is {1}{2}", 
+                        vehicle.VehicleSerial, vehicle.GarageStatus.ToString(), Environment.NewLine);
+                }
             }
 
+            return licensePlateOfWantedVehicles;
         }
 
         //public enum eVehicleType
