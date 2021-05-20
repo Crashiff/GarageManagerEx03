@@ -113,30 +113,56 @@ namespace ConsoleUI
             }
         }
 
-        public void DisplayAllVehiclesInCurrentStatus(GarageLogicManager i_Garage)
+       private void askUserForVehicleStatus()
         {
             int i = 0;
             string[] statusNames = Enum.GetNames(typeof(Vehicle.eGarageStatus));
-            StringBuilder menuToPrint = new stringBuilder(120); // maybe change 120 to const for readabilty
-            menuToPrint.appendLine("Please enter numbers according to the data below, you can chose multiple values(separated with a space ends with new line):")
+            StringBuilder optionsToPrint = new stringBuilder();
+            optionsToPrint.AppendLine("Please enter numbers according to the options below {0} you can chose multiple values(separated with a space ends with new line):", Environment.NewLine)
             foreach (int statuse in Enum.GetValues(typeof(Vehicle.eGarageStatus)))
             {
-                menuToPrint.appendLine("For {0} press {1} ", names[i++], Value);
+                optionsToPrint.AppendFormat("For {0} press {1} ", names[i++], Value, Environment.NewLine);
             }
 
-            int[] vehicleStatusToDisplay = new String[vehicleStatusToDisplay.length / 2 + 1]
-            foreach (int i = 0  ; i < vehicleStatusToDisplay.length; i++)
+            Console.WriteLine(optionsToPrint);
+        }
+
+        public void DisplayAllVehiclesInCurrentStatus(GarageLogicManager i_Garage)
+        {
+            int i = 0;
+            askUserForVehicleStatus();
+            int[] vehicleStatusToDisplay = new int[Enum.GetNames(typeof(Vehicle.eGarageStatus)).Length];
+            string choosenOption = Console.ReadLine();
+            foreach (char option in choosenOption)
             {
-                 int.TryParse(Console.ReadKey() , out vehicleStatusToDisplay[i]);
+                if (char.IsDigit(option))
+                {
+                    vehicleStatusToDisplay[i++] = (int)option;
+                }
+                else
+                {
+                    if (option != ' ')
+                    {
+                        throw new FormatException("enter only digits according to the option that was given");
+                    }
+                }
             }
 
-            string str = GetListOfVehicleByStatus(vehicleStatusToDisplay);
+            Console.WriteLine(GetListOfVehicleByStatus(vehicleStatusToDisplay));
+        }
 
+        private bool letUserChooseCarOption(GarageLogicManager garageInstance)
+        {
+            int userOption = 0;
+            string[] VehicleTypes = Enum.GetNames(typeof(VehicleCreator.eVehicleTypes));
 
+            Console.WriteLine("Please choose 1 of the following options or enter '0' for none of them");
+            for (int index = 1; index <= VehicleTypes.Length; index++)
+            {
+                Console.WriteLine(index + ". " + VehicleTypes[index - 1]);
+            }
 
-
-
-
+            return userOption != 0;
         }
 
         private bool letUserChooseCarOption(GarageLogicManager garageInstance)
