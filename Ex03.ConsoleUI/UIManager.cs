@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Text;
-using System.Reflection.Emit;
 using Ex03.GarageLogic;
 
 
@@ -9,22 +8,6 @@ namespace ConsoleUI
 
     class GarageUIManager
     {
-
-
-        private StringBuilder buildMenu()
-        {
-            const k_MaxNumberOfCharsIn 120;
-            int i = 0;
-            string[] vhecleNames = Enum.GetNames(typeof(eMenuOptions));
-            StringBuilder menuToPrint = new stringBuilder(k_MaxNumberOfCharsIn); // maybe change 120 to const for readabilty
-            foreach (int Value in Enum.GetValues(typeof(VehicleCreator.eVehicleType)))
-            {
-                menuToPrint.AppendLine("For {0} press {1} ", names[i++], Value);
-            }
-
-            return menuToPrint;
-        }
-
         public void GarageManager()
         {
             bool managerIsActive = true;
@@ -32,253 +15,314 @@ namespace ConsoleUI
 
             while (managerIsActive)
             {
-                Console.WriteLine(buildMenu()); // add stringBuilder
-                int chosenCase = int.Parse(Console.ReadLine());
+                eMenuOptions chosenCase = getOptionInput();
 
                 switch (chosenCase)
                 {
-                    case (int)eMenuOptions.EnterNewVehicle:
-                        {
-                            bool ChoseValidOption = letUserChooseCarOption(garageInstance);
-                            if (ChoseValidOption)
-                            {
-                                Console.WriteLine("Please enter vehicle serial:");
-                                string carSerialInput = Console.ReadLine();
-                                Vehicle toEnterVehicle = null;
-                                if (garageInstance.GarageDictionary.TryGetValue(carSerialInput, out toEnterVehicle)) { }
-                                else
-                                {
-                                    toEnterVehicle = VehicleCreator.CreateVehicle(1);
-                                    garageInstance.GarageDictionary.Add(carSerialInput, toEnterVehicle);
-                                }
-
-                                setRequiredInputs(toEnterVehicle);
-                            }
-
-                            break;
-                        }
-                    case (int)eMenuOptions.DisplayAllVehiclesByAttribute:
-                        {
-                            DisplayAllVehiclesInCurrentStatus(garageInstance);
-                            break;
-                        }
-                    case (int)eMenuOptions.ChangeCarStatus:
-                        {
-
-                            break;
-                        }
-                    case (int)eMenuOptions.InflateWheelsToMaximum:
-                        {
-                            Console.WriteLine("Enter the 'Serial' of the vehicle which you want to inflate it's wheels");
-                            string carSerial = Console.ReadLine();
-                            garageInstance.InflateWheels(carSerial);
-                            break;
-                        }
-                    case (int)eMenuOptions.FillPetrolToVehicle:
-                        {
-                            Console.WriteLine("Enter the 'Serial' of the vehicle which you want to petrol in");
-                            string carSerial = Console.ReadLine();
-                            Console.WriteLine("Enter the type of petrol to fill");
-                            string petrolType = Console.ReadLine();
-                            Console.WriteLine("Enter amount of petrol to fill");
-                            float petrolAmount = float.Parse(Console.ReadLine());
-                            garageInstance.FillPetrol(carSerial, petrolType, petrolAmount);
-                            break;
-                        }
-                    case (int)eMenuOptions.ChargeElectricVehicle:
-                        {
-                            Console.WriteLine("Enter the 'Serial' of the vehicle which you want to charge");
-                            string carSerial = Console.ReadLine();
-                            Console.WriteLine("Enter amount of minutes to charge into the vehicle");
-                            float minutesAmount = float.Parse(Console.ReadLine());
-                            garageInstance.ChargeElectricity(carSerial, minutesAmount);
-                            break;
-                        }
-                    case (int)eMenuOptions.DisplayAllInfoOfVehicle:
-                        {
-                            Console.WriteLine("Enter the serial of the car which you want to display all information of");
-                            string carSerial = Console.ReadLine();
-                            Vehicle toBeDisplayed = null;
-                            bool vehicleExists = garageInstance.GarageDictionary.TryGetValue(carSerial, out toBeDisplayed);
-                            Console.WriteLine(toBeDisplayed.ToString());
-                            break;
-                        }
-                    case (int)eMenuOptions.ExitProgram:
-                        {
-                            managerIsActive = false;
-                            break;
-                        }
+                    case eMenuOptions.EnterNewVehicle:
+                    {
+                        enterNewVehicle(garageInstance);
+                        break;
+                    }
+                    case eMenuOptions.DisplayAllVehiclesByAttribute:
+                    {
+                        DisplayAllVehiclesInCurrentStatus(garageInstance);
+                        break;
+                    }
+                    case eMenuOptions.ChangeCarStatus:
+                    {
+                        changeACarsStatus(garageInstance);
+                        break;
+                    }
+                    case eMenuOptions.InflateWheelsToMaximum:
+                    {
+                        inflateCarsWheelsToMaximum(garageInstance);
+                        break;
+                    }
+                    case eMenuOptions.FillPetrolToVehicle:
+                    {
+                        fillPetrolToAVehicle(garageInstance);
+                        break;
+                    }
+                    case eMenuOptions.ChargeElectricVehicle:
+                    {
+                        chargeACarWithElectricity(garageInstance);
+                        break;
+                    }
+                    case eMenuOptions.DisplayAllInfoOfVehicle:
+                    {
+                        displayAllInformationOfSpecifiedVehicle(garageInstance);
+                        break;
+                    }
+                    case eMenuOptions.ExitProgram:
+                    {
+                        managerIsActive = false;
+                        break;
+                    }
+                    default:
+                    {
+                        Console.WriteLine("Invalid menu option");
+                        break;
+                    }
 
                 }
             }
         }
 
-        public void DisplayAllVehiclesInCurrentStatus(GarageLogicManager i_Garage)
+        private void enterNewVehicle(GarageLogicManager i_GarageInstance)
         {
-            int i = 0;
-            string[] statusNames = Enum.GetNames(typeof(Vehicle.eGarageStatus));
-            StringBuilder menuToPrint = new stringBuilder(120); // maybe change 120 to const for readabilty
-            menuToPrint.appendLine("Please enter numbers according to the data below, you can chose multiple values(separated with a space ends with new line):")
-            foreach (int statuse in Enum.GetValues(typeof(Vehicle.eGarageStatus)))
+            bool codeSectionCompleted = false;
+            VehicleCreator.eVehicleTypes chosenVehicleOption = letUserChooseCarOption(); ;
+            if (Enum.IsDefined(typeof(VehicleCreator.eVehicleTypes), chosenVehicleOption))
             {
-                menuToPrint.appendLine("For {0} press {1} ", names[i++], Value);
-            }
+                Console.WriteLine("Please enter vehicle serial:");
+                string carSerialInput = Console.ReadLine();
+                Vehicle toEnterVehicle = null;
+                if (i_GarageInstance.GarageDictionary.TryGetValue(carSerialInput, out toEnterVehicle)) { }
+                else
+                {
+                    toEnterVehicle = VehicleCreator.CreateVehicle(chosenVehicleOption);
+                    i_GarageInstance.GarageDictionary.Add(carSerialInput, toEnterVehicle);
+                }
 
-            int[] vehicleStatusToDisplay = new String[vehicleStatusToDisplay.length / 2 + 1]
-            foreach (int i = 0  ; i < vehicleStatusToDisplay.length; i++)
+                setBaseProperties(toEnterVehicle, carSerialInput);
+                setRequiredInputs(toEnterVehicle);
+            }
+        }
+
+        private void changeACarsStatus(GarageLogicManager i_GarageInstance)
+        {
+            Console.WriteLine("Enter the 'Serial' of the vehicle which you want to inflate it's wheels");
+            string carSerial = Console.ReadLine();
+            Console.WriteLine("Please enter the new status of the vehicle (InRepair, Repaired, RepairedAndPaid): ");
+            string userInput = Console.ReadLine();
+            try
             {
-                 int.TryParse(Console.ReadKey() , out vehicleStatusToDisplay[i]);
+                i_GarageInstance.ChangeStatus(carSerial, userInput);
             }
-
-            string str = GetListOfVehicleByStatus(vehicleStatusToDisplay);
-
-
-
-
-
+            catch (ArgumentException badArgumentException)
+            {
+                Console.WriteLine(badArgumentException.Message);
+            }
 
         }
 
-        private bool letUserChooseCarOption(GarageLogicManager garageInstance)
+        private void inflateCarsWheelsToMaximum(GarageLogicManager i_GarageInstance)
         {
-            int userOption = 0;
-            string[] VehicleTypes = Enum.GetNames(typeof(VehicleCreator.eVehicleTypes));
-
-            Console.WriteLine("Please choose 1 of the following options or enter '0' for none of them");
-            for (int index = 1; index <= VehicleTypes.Length; index++)
+            Console.WriteLine("Enter the 'Serial' of the vehicle which you want to inflate it's wheels");
+            string carSerial = Console.ReadLine();
+            try
             {
-                Console.WriteLine(index + ". " + VehicleTypes[index - 1]);
+                i_GarageInstance.InflateWheels(carSerial);
+            }
+            catch (Exception carDoesntExistException)
+            {
+                Console.WriteLine(carDoesntExistException);
+            }
+        }
+
+        private void fillPetrolToAVehicle(GarageLogicManager i_GarageInstance)
+        {
+            Console.WriteLine("Enter the 'Serial' of the vehicle which you want to petrol in");
+            string carSerial = Console.ReadLine();
+            Console.WriteLine("Enter the type of petrol to fill");
+            string petrolType = Console.ReadLine();
+            Console.WriteLine("Enter amount of petrol to fill");
+            float petrolAmount = float.Parse(Console.ReadLine());
+
+            try
+            {
+                i_GarageInstance.FillPetrol(carSerial, petrolType, petrolAmount);
+            }
+            catch (FormatException parseFailException)
+            {
+                Console.WriteLine(parseFailException);
+            }
+            catch (Exception relevantError)
+            {
+                Console.WriteLine(relevantError);
             }
 
-            return userOption != 0;
+        }
+
+        private void chargeACarWithElectricity(GarageLogicManager i_GarageInstance)
+        {
+            Console.WriteLine("Enter the 'Serial' of the vehicle which you want to charge");
+            string carSerial = Console.ReadLine();
+            Console.WriteLine("Enter amount of minutes to charge into the vehicle");
+            string minutesAmount = Console.ReadLine();
+            try
+            {
+                i_GarageInstance.ChargeElectricity(carSerial, minutesAmount);
+            }
+            catch (FormatException parseFailException)
+            {
+                Console.WriteLine(parseFailException);
+            }
+            catch (Exception otherException)
+            {
+                Console.WriteLine(otherException);
+            }
+
+        }
+
+        private void askUserForVehicleStatus()
+        {
+            int i = 0;
+            string[] statusNames = Enum.GetNames(typeof(Vehicle.eGarageStatus));
+            StringBuilder optionsToPrint = new StringBuilder();
+            optionsToPrint.AppendFormat(
+                "Please enter numbers according to the options below {0} you can chose multiple values(separated with a space ends with new line):{0}",
+                Environment.NewLine);
+            foreach (int statuse in Enum.GetValues(typeof(Vehicle.eGarageStatus)))
+            {
+                optionsToPrint.AppendFormat("For {0} press {1}{2}", statusNames[i++], statuse, Environment.NewLine);
+            }
+
+            Console.WriteLine(optionsToPrint);
+        }
+
+        public void DisplayAllVehiclesInCurrentStatus(GarageLogicManager i_GarageInstance)
+        {
+            int i = 0;
+            askUserForVehicleStatus();
+            int[] vehicleStatusToDisplay = new int[Enum.GetNames(typeof(Vehicle.eGarageStatus)).Length];
+            string choosenOption = Console.ReadLine();
+            foreach (char option in choosenOption)
+            {
+                if (char.IsDigit(option))
+                {
+                    vehicleStatusToDisplay[i++] = (int)char.GetNumericValue(option);
+                }
+                else
+                {
+                    if (option != ' ')
+                    {
+                        throw new FormatException("enter only digits according to the option that was given");
+                    }
+                }
+            }
+
+            Console.WriteLine(i_GarageInstance.GetListOfVehicleByStatus(vehicleStatusToDisplay));
+        }
+
+        private void displayAllInformationOfSpecifiedVehicle(GarageLogicManager i_GarageInstance)
+        {
+            Console.WriteLine("Enter the serial of the car which you want to display all information of");
+            string carSerial = Console.ReadLine();
+            Vehicle toBeDisplayed = null;
+            bool vehicleExists = i_GarageInstance.GarageDictionary.TryGetValue(carSerial, out toBeDisplayed);
+            Console.WriteLine(toBeDisplayed.ToString());
+        }
+
+        private VehicleCreator.eVehicleTypes letUserChooseCarOption()
+        {
+            VehicleCreator.eVehicleTypes userOption = 0;
+            string[] VehicleTypes = Enum.GetNames(typeof(VehicleCreator.eVehicleTypes));
+
+            Console.WriteLine("Please choose One of the following options by its corresponding number or any other value for none of them");
+            for (int index = 1; index <= VehicleTypes.Length; index++)
+            {
+                Console.Write(index + ".");
+                printSpacelessPhraseByUppercase(VehicleTypes[index - 1]);
+            }
+
+            userOption = (VehicleCreator.eVehicleTypes)Enum.Parse(typeof(VehicleCreator.eVehicleTypes), Console.ReadLine());
+            return userOption;
+        }
+
+        private void printSpacelessPhraseByUppercase(string I_PhraseToPrint)
+        {
+            for (int i = 0; i < I_PhraseToPrint.Length; i++)
+            {
+                if (char.IsUpper(I_PhraseToPrint[i]))
+                {
+                    Console.Write(' ');
+                }
+                Console.Write(I_PhraseToPrint[i]);
+            }
+            Console.Write(Environment.NewLine);
+        }
+
+        private void setBaseProperties(Vehicle toEnterVehicle, string i_VehicleSerial)
+        {
+            Console.WriteLine("Please enter Owner Name");
+            toEnterVehicle.OwnerName = Console.ReadLine();
+            Console.WriteLine("Please enter Owner Phone number");
+            toEnterVehicle.OwnerPhoneNumber = int.Parse(Console.ReadLine());
+            Console.WriteLine("Please enter Vehicle Brand");
+            toEnterVehicle.VehicleBrand = Console.ReadLine();
+
+            toEnterVehicle.VehicleGarageStatus = Vehicle.eGarageStatus.InRepair;
+            toEnterVehicle.VehicleSerial = i_VehicleSerial;
         }
 
         private void setRequiredInputs(Vehicle toEnterVehicle)
         {
-            int numberOfVehicles = VehicleCreator.VehicleTypes.Length - 1;
+            string[] VehicleTypes = toEnterVehicle.GetPropertiesNames();
+            for (int propertyIndex = 0; propertyIndex < VehicleTypes.Length; propertyIndex++)
+            {
+                Console.Write("Please enter the vehicle's:");
+                printSpacelessPhraseByUppercase(VehicleTypes[propertyIndex]);
+                string propertyUserInput = Console.ReadLine();
+                toEnterVehicle.UpdatePropertyByStringInputAndPropertyIndex(propertyUserInput, propertyIndex);
+            }
         }
 
+        private StringBuilder buildMenu()
+        {
+            int i = 0;
+            const int k_MaxNumberOfCharsIn = 120;
+            string[] menuOptions = Enum.GetNames(typeof(eMenuOptions));
+            StringBuilder menuToPrint = new StringBuilder(k_MaxNumberOfCharsIn);
+            foreach (int value in Enum.GetValues(typeof(eMenuOptions)))
+            {
+                menuToPrint.AppendFormat("For {0} press {1}{2}", menuOptions[i++], value, Environment.NewLine);
+            }
 
-        //public Vehicle GetInputForVehicle(int i_InputForVehicle)
-        //{
-        //    Vehicle vehicle = new Car();
-        //    bool isElctric = true;
-        //    switch (i_InputForVehicle)
-        //    {
-        //        case (int)GarageLogicManager.eVehicleType.ElectricCar:
-        //            vehicle = MakeCar(isElctric);
-        //            break;
-        //        case (int)GarageLogicManager.eVehicleType.PetrolCar:
-        //            vehicle = MakeCar(!isElctric);
-        //            break;
-        //        case (int)GarageLogicManager.eVehicleType.ElectricBike:
-        //            vehicle = MakeBike(isElctric);
-        //            break;
-        //        case (int)GarageLogicManager.eVehicleType.PetrolBike:
-        //            vehicle = MakeBike(!isElctric);
-        //            break;
-        //        case (int)GarageLogicManager.eVehicleType.Truck:
-        //            vehicle = MakeTruck();
-        //            break;
-        //    }
+            return menuToPrint;
+        }
 
-        //    return vehicle;
-        //}
+        private eMenuOptions getOptionInput()
+        {
+            eMenuOptions chosenOption = 0;
 
-        //private string getPhoneNumber()
-        //{
-        //    string phoneNumber = Console.ReadLine();
-        //    bool validPhoneNumber = true;
-        //    foreach(char c in phoneNumber)
-        //    {
-        //        if(!char.IsDigit(c))
-        //        {
-        //            validPhoneNumber = false;
-        //            break;
-        //        }
-        //    }
+            while (!Enum.IsDefined(typeof(eMenuOptions), chosenOption))
+            {
+                try
+                {
+                    Console.WriteLine(buildMenu());
+                    chosenOption = (eMenuOptions)Enum.Parse(typeof(eMenuOptions), Console.ReadLine());
+                    if (!Enum.IsDefined(typeof(eMenuOptions), chosenOption))
+                    {
+                        throw new IndexOutOfRangeException("ERROR: Input is not in range of valid options, try again");
+                    }
 
-        //    return validPhoneNumber ? phoneNumber : throw new Exception("phone number is not valid");
-        //}
-        //public void GetBasicAttributes(out string o_BrandName, out string o_OwnerName, out string o_PhoneNumber, out  string o_SerialNumber, out float o_EnergyLeft)
-        //{
-        //    Console.WriteLine("please enter owner name:");
-        //    o_OwnerName = Console.ReadLine();
+                }
+                catch (ArgumentException)
+                {
+                    Console.WriteLine("ERROR: Invalid option input, try again");
+                }
+                catch (IndexOutOfRangeException rangeErrorException)
+                {
+                    Console.WriteLine(rangeErrorException.Message);
+                }
 
-        //    Console.WriteLine("please enter brand name:");
-        //    o_BrandName = Console.ReadLine();
+            }
 
-        //    Console.WriteLine("Please enter customer phone number:");
-        //    o_PhoneNumber = getPhoneNumber(); // can throwing error
-
-        //    Console.WriteLine("Please enter vehicle serial number:");
-        //    o_SerialNumber = Console.ReadLine();
-
-        //    Console.WriteLine("Please enter remaining energy: ");
-        //    float.TryParse(Console.ReadLine(), out o_EnergyLeft);
-        //}
-
-        //private void getElectricAttributes(out float o_RemainingBatteryHours)
-        //{
-        //    Console.WriteLine("Please enter the remaining battery hours left:");
-        //    float.TryParse(Console.ReadLine(),out o_RemainingBatteryHours);
-        //}
-
-        //private void getPetrolAttributes(out int o_FuelType , out float o_CurrentFuelLitters)
-        //{
-        //    Console.WriteLine("Please enter fuel type: 1 - Soler, 2 - 95 , 3 - 96 , 4 - 98:");
-        //    int.TryParse(Console.ReadLine(), out o_FuelType);
-
-        //    Console.WriteLine("Please enter current litter of fuel in the tank"); // need to throe out pf range exception here
-        //    float.TryParse(Console.ReadLine(), out o_CurrentFuelLitters);
-        //}
-
-        //private void getWheelAttributes(out string o_WheelBrand, out float o_CurrentAirPressure)
-        //{
-        //    Console.WriteLine("Please enter wheel brand");
-        //    o_WheelBrand = Console.ReadLine();
-
-        //    Console.WriteLine("Please enter wheels current air pressure:"); // needs throw outofrange ex if needed
-        //    float.TryParse(Console.ReadLine(), out o_CurrentAirPressure);
-        //}
-
-        //public Car MakeCar(bool i_IsElectric)
-        //{
-
-        //    string brandName, ownerName, phoneNumber, serialNumber;
-        //    float energyLeft;
-        //    GetBasicAttributes(out brandName, out ownerName, out phoneNumber, out serialNumber, out energyLeft);
-
-        //    Console.WriteLine("Please enter car color: 1 - Red, 2 - Silver , 3 - White , 4 - Black");
-        //    int.TryParse(Console.ReadLine() ,out int CarColor);
-
-        //    Console.WriteLine("Please enter numbers of doors(2 - 5): ");
-        //    int.TryParse(Console.ReadLine(), out int NumberOfDoors);
-
-        //    getWheelAttributes(out string wheelBrand, out float currentAirPressure);
-
-        //    if(i_IsElectric)
-        //    {
-        //        getElectricAttributes(out float remainingBatteryHours);
-        //    }
-
-        //    else
-        //    {
-        //        getPetrolAttributes(out int fuelType , out float currentFuelLitters);
-        //    }
-
+            return chosenOption;
+        }
     }
-
 
     enum eMenuOptions
     {
-        EnterNewVehicle = 1, //v/
+        EnterNewVehicle = 1, 
         DisplayAllVehiclesByAttribute,
-        ChangeCarStatus,
-        InflateWheelsToMaximum, //v//
-        FillPetrolToVehicle, //v//
-        ChargeElectricVehicle, //v//
-        DisplayAllInfoOfVehicle, //v//
-        ExitProgram //check
+        ChangeCarStatus, //Completed//
+        InflateWheelsToMaximum, //Completed//
+        FillPetrolToVehicle, //Completed//
+        ChargeElectricVehicle, //Completed//
+        DisplayAllInfoOfVehicle, 
+        ExitProgram //Completed//
     }
 }

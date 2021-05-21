@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using ConsoleUI;
 using Ex03.GarageLogic;
 
 namespace Ex03.ConsoleUI
@@ -9,8 +10,8 @@ namespace Ex03.ConsoleUI
     {
         public static void Main()
         {
-            //Vehicle.fun();
-            //VehicleCreator.GetPropertiesInformation(1);
+            GarageUIManager Instance = new GarageUIManager();
+            Instance.GarageManager();
             Console.Read();
         }
     }
