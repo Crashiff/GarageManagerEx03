@@ -1,44 +1,40 @@
 ﻿using System;
-
+using System.Text;
 namespace Ex03.GarageLogic
 {
     public class Wheel
     {
         private string m_BrandName;
+        private float m_CurrentAirPressure;
+        private readonly float m_MaxAirPressure;
 
         public string BrandName
         {
-            get;
-            private set;
+            get { return m_BrandName; }
+            set { m_BrandName = value; }
         }
-
-        private float m_CurrentAirPressure;
 
         public float CurrentAirPressure
         {
-            get;
-            private set;
+            get { return m_CurrentAirPressure; }
+            set { m_CurrentAirPressure = value; }
         }
 
-        private float m_MaxAirPressure;
-
-        public float MaxAirPressure
+        public Wheel(int i_MaxWheelPressure)
         {
-            get;
-            private set;
+            m_MaxAirPressure = i_MaxWheelPressure;
         }
 
-        public bool InflateWheel(float i_AmountOfAirToInflate)
+        //public override string ToString()
+        //{
+        //    StringBuilder wheelToPrint = new StringBuilder();
+        //    wheelToPrint.AppendFormat("wheels:{2}air pressure: {0}{2} Brand: {1} " ,CurrentAirPressure , BrandName , Environment.NewLine);
+        //    return;
+        //}
+
+        public void InflateWheel()
         {
-            const bool k_IsValidAirPressure = true;
-            if (!(CurrentAirPressure + i_AmountOfAirToInflate > MaxAirPressure))
-            {
-                throw new Exception("Air pressure overflow in wheels");
-            }
-
-            CurrentAirPressure += i_AmountOfAirToInflate;
-
-            return k_IsValidAirPressure;
+            m_CurrentAirPressure = m_MaxAirPressure;
         }
-    } // Class Wheel 
-} // namespace
+    }
+}

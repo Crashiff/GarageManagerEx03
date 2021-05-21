@@ -10,6 +10,12 @@ namespace Ex03.GarageLogic
         private float m_MaximumWeightCapacity;
         private bool m_ContainsDangerousMaterials;
 
+        private const int k_TruckMaxWheelPressure = 26;
+        private const int k_NumberOfWheels = 16;
+
+        private const string k_PetrolType = "Soler";
+        private const float k_MaxPetrolLiterCapacity = 120.0f;
+
         public float MaximumWeightCapacity
         {
             get { return MaximumWeightCapacity; }
@@ -22,16 +28,22 @@ namespace Ex03.GarageLogic
             set { m_ContainsDangerousMaterials = value; }
         }
 
-        public Truck()
+        public Truck(bool isElectric)
         {
-            
+            m_VehicleWheels = VehicleCreator.createWheels(k_NumberOfWheels, k_TruckMaxWheelPressure);
+            m_VehicleEngine = VehicleCreator.CreateEngine(isElectric);
+
+            PetrolEngine petrolEngine = m_VehicleEngine as PetrolEngine;
+            petrolEngine.MaximumPetrolAmount = k_MaxPetrolLiterCapacity;
+            petrolEngine.PetrolType = k_PetrolType;
+
         }
 
         public override void UpdatePropertyByStringInputAndPropertyIndex(string i_UserInput, int PropertyIndex)
         {
             switch (PropertyIndex)
             {
-                case 1:
+                case (int)eTruckProperties.MaximumWeightCapacity:
                 {
                     float MaximumCapacityInput= float.Parse(i_UserInput);
                     if (!(MaximumCapacityInput > 0))
@@ -44,7 +56,7 @@ namespace Ex03.GarageLogic
                     }
                     break;
                 }
-                case 2:
+                case (int)eTruckProperties.ContainsDangerousMaterialsYesOrNo:
                 {
                     if (i_UserInput == "Yes" || i_UserInput == "yes")
                     {
@@ -63,6 +75,15 @@ namespace Ex03.GarageLogic
             }
         }
 
-        public int k_MaxWheelPressure = 26;
+        public override string[] GetPropertiesNames()
+        {
+            return Enum.GetNames(typeof(eTruckProperties));
+        }
+
+        private enum eTruckProperties
+        {
+            MaximumWeightCapacity = 0,
+            ContainsDangerousMaterialsYesOrNo
+        }
     }
 }

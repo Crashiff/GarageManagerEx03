@@ -7,47 +7,46 @@ namespace Ex03.GarageLogic
 {
     public class VehicleCreator
     {
-        public static Vehicle CreateVehicle(/*string carSerial*/int i_vehicleIndex)
+        private const bool v_Electric = true;
+        private const bool v_Petrol = false;
+
+        public static Vehicle CreateVehicle(VehicleCreator.eVehicleTypes chosenVehicleOption)
         {
-            //if (GarageLogicManager.Garage.GarageDictionary.ContainsKey(carSerial))
-            //{
-            //    Vehicle toGet = null;
-            //    GarageLogicManager.Garage.GarageDictionary.TryGetValue(carSerial, out toGet);
-            //}
             Vehicle createdVehicle = null;
 
-            switch (i_vehicleIndex)
+            switch (chosenVehicleOption)
             {
-                case 1:
+                case eVehicleTypes.ElectricCar:
                 {
-                    createdVehicle = new Car();
+                    
+                    createdVehicle = new Car(v_Electric);
+                    break;
+                    
+                }
+                case eVehicleTypes.PetrolCarWithOctan95:
+                {
+                    createdVehicle = new Car(v_Petrol);
                     break;
                 }
-                case 2:
+                case eVehicleTypes.PetrolMotorbikeWithOctan98:
                 {
-                    createdVehicle = new Motorbike();
+                    createdVehicle = new Motorbike(v_Petrol);
+                    break;
+                    }
+                case eVehicleTypes.ElectricMotorbike:
+                {
+                    createdVehicle = new Motorbike(v_Electric);
+                    break;
+                    }
+                case eVehicleTypes.TruckWithSoler:
+                {
+                    createdVehicle = new Truck(v_Petrol);
                     break;
                 }
-                case 3:
-                {
-                    createdVehicle = new Truck();
-                    break;
-                }
-
             }
 
             return createdVehicle;
         }
-
-
-        //public enum eVehicleType
-        //{
-        //    ElectricCar = 1,
-        //    PetrolCar = 2,
-        //    ElectricBike = 3,
-        //    PetrolBike = 4,
-        //    Truck = 5
-        //}
 
         public static Engine CreateEngine(bool i_IsElectric)
         {
@@ -55,53 +54,24 @@ namespace Ex03.GarageLogic
             return i_IsElectric ? createdEngine = new ElectricEngine() : createdEngine = new PetrolEngine();
         }
 
-        public static Wheel createWheel(int i_AmountOfWheels)
+        public static Wheel[] createWheels(int i_AmountOfWheels, int i_MaxWheelPressure)
         {
-            return new Wheel(); ///change
+             Wheel[] Wheels = new Wheel[i_AmountOfWheels];
+             for (int wheelIndex = 0; wheelIndex < Wheels.Length; wheelIndex++)
+             {
+                 Wheels[wheelIndex] = new Wheel(i_MaxWheelPressure);
+             }
+
+             return Wheels;
         }
 
-        public static ParameterInfo[] GetConstructorParametersInformation()
-        {
-            return VehicleTypes[0].GetConstructor(new Type[2] { typeof(string), typeof(string) }).GetParameters();
-            
-        }
-
-        public static void GetPropertiesInformation(int indexOfVehicle )
-        {
-            Vehicle some = new Car();
-            //return VehicleTypes[indexOfVehicle].GetProperties();
-            PropertyInfo[] propInfo = VehicleTypes[indexOfVehicle].GetProperties();
-            foreach (PropertyInfo property in propInfo)
-            {
-                if (property.PropertyType != typeof(string))
-                {
-                    Console.WriteLine("Please enter: " + property.Name);
-                    MethodInfo ParseMethod = property.PropertyType.GetMethod("Parse", new Type[1] { typeof(string) });
-                    property.SetValue(some ,ParseMethod.Invoke(null, new object[1] {Console.ReadLine()} ), null);
-                }
-                else
-                {
-                    Console.WriteLine("Please enter: " + property.Name);
-                    property.SetValue(some, Console.ReadLine(), null);
-                }
-             
-                
-            }
-
-        }
-        public static PropertyInfo[] GetPropertiesInformation(bool isElectric)
-        {
-            return isElectric ? typeof(ElectricEngine).GetProperties() : typeof(PetrolEngine).GetProperties();
-
-        }
-
-        public static readonly Type[] VehicleTypes = { typeof(Vehicle), typeof(Car), typeof(Motorbike), typeof(Truck) };
-        
         public enum eVehicleTypes
         {
-            Car = 1,
-            Motorbike,
-            Truck
+            ElectricCar = 1,
+            PetrolCarWithOctan95, 
+            ElectricMotorbike,
+            PetrolMotorbikeWithOctan98,
+            TruckWithSoler
         }
     }
 }

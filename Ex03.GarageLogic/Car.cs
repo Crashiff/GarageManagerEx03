@@ -8,7 +8,32 @@ namespace Ex03.GarageLogic
     {
         private eCarColor      m_CarColor;
         private eNumberOfDoors m_NumberOfDoors;
-        public const int       k_CarMaxWheelPressure = 32;
+
+        private const int       k_CarMaxWheelPressure = 32;
+        private const int k_NumberOfWheels = 4;
+
+        private const string k_PetrolType = "Octan95";
+        private const float k_MaxPetrolLiterCapacity = 45.0f;
+        private const float k_MaxBatteryHoursCapacity = 3.2f;
+
+        public Car(bool isElectric)
+        {
+            m_VehicleWheels = VehicleCreator.createWheels(k_NumberOfWheels, k_CarMaxWheelPressure);
+
+            m_VehicleEngine = VehicleCreator.CreateEngine(isElectric);
+            if (isElectric)
+            {
+                ElectricEngine electricEngine = m_VehicleEngine as ElectricEngine;
+                electricEngine.MaximumBatteryHours = k_MaxBatteryHoursCapacity;
+            }
+            else
+            {
+                PetrolEngine petrolEngine = m_VehicleEngine as PetrolEngine;
+                petrolEngine.MaximumPetrolAmount = k_MaxPetrolLiterCapacity;
+                petrolEngine.PetrolType = k_PetrolType;
+            }
+        
+        }
 
         public eCarColor Color
         {
@@ -20,7 +45,7 @@ namespace Ex03.GarageLogic
         {
             switch (PropertyIndex)
             {
-                case 1:
+                case (int)eCarProperties.CarColor:
                 {
                     eCarColor inputColor = (eCarColor)Enum.Parse(typeof(eCarColor), i_UserInput);
                     if (!(Enum.IsDefined(typeof(eCarColor), i_UserInput)))
@@ -33,7 +58,7 @@ namespace Ex03.GarageLogic
                     }
                     break;
                 }
-                case 2:
+                case (int)eCarProperties.NumberOfDoors:
                 {
                     eNumberOfDoors inputNumberOfDoors = (eNumberOfDoors)Enum.Parse(typeof(eNumberOfDoors), i_UserInput);
                     if (!(Enum.IsDefined(typeof(eNumberOfDoors), int.Parse(i_UserInput)) || Enum.IsDefined(typeof(eNumberOfDoors), i_UserInput)))
@@ -49,9 +74,20 @@ namespace Ex03.GarageLogic
             }
         }
 
-        public Car()
-        {
 
+
+        //public override string ToString()
+        //{
+        //    StringBiulder carToPrint = new StringBiulder();
+        //    carToPrint.AppendFormat(@"{0} Car:
+        //                              {1}{2}{3}{4}{5}{6}" , base.ToString() , )
+        //    return 
+        //}
+
+
+        public override string[] GetPropertiesNames()
+        {
+            return Enum.GetNames(typeof(eCarProperties));
         }
 
         public enum eCarColor
@@ -60,6 +96,12 @@ namespace Ex03.GarageLogic
             Silver,
             White,
             Black
+        }
+
+        private enum eCarProperties
+        {
+            CarColor = 0,
+            NumberOfDoors
         }
 
         public enum eNumberOfDoors
